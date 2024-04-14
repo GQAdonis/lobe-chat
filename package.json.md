@@ -85,3 +85,57 @@ However, there are a few questions that remain unanswered:
 Addressing these questions would provide a more comprehensive understanding of the architectural decisions and their implications for the project.
 
 Overall, the documentation serves as a valuable reference point for developers working on the project, offering insights into the key components, their interactions, and the rationale behind the chosen architecture. It provides a solid foundation for further exploration and decision-making as the project evolves.
+
+## Dependencies
+
+Here's a Mermaid diagram that illustrates the dependencies among the key components mentioned in the package.json:
+
+```mermaid
+graph TD
+  A[Next.js] --> B[React]
+  A --> C[React DOM]
+  A --> D[@lobehub/ui]
+  A --> E[Ant Design]
+  A --> F[Zustand]
+  A --> G[i18next]
+  A --> H[@auth/core]
+  A --> I[next-auth]
+  A --> J[@vercel/analytics]
+  A --> K[OpenAI]
+  A --> L[Anthropic AI SDK]
+  A --> M[Azure OpenAI]
+  A --> N[Google Generative AI]
+
+  B --> D
+  B --> E
+
+  G --> O[react-i18next]
+  G --> P[i18next-browser-languagedetector]
+  G --> Q[i18next-resources-to-backend]
+
+  H --> I
+
+  K --> R[gpt-tokenizer]
+  K --> S[langfuse]
+  K --> T[ollama]
+
+  L --> S
+
+  M --> S
+
+  N --> S
+```
+
+This diagram showcases the following dependencies:
+
+- Next.js (A) is the central component that depends on React (B), React DOM (C), `@lobehub/ui` (D), Ant Design (E), Zustand (F), i18next (G), `@auth/core` (H), `next-auth` (I), `@vercel/analytics` (J), and the various AI and language model libraries (K, L, M, N).
+
+- React (B) is a dependency of `@lobehub/ui` (D) and Ant Design (E).
+
+- i18next (G) has dependencies on `react-i18next` (O), `i18next-browser-languagedetector` (P), and `i18next-resources-to-backend` (Q).
+
+- `@auth/core` (H) is a dependency of `next-auth` (I).
+
+- The AI and language model libraries (K, L, M, N) have dependencies on various utility libraries like `gpt-tokenizer` (R), `langfuse` (S), and `ollama` (T).
+
+This diagram provides a visual representation of how the components are interconnected and highlights the key dependencies within the architecture.
