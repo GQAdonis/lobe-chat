@@ -25,6 +25,7 @@ COPY package.json ./
 RUN pnpm i
 
 COPY . .
+COPY ./env/.env .
 RUN pnpm run build:docker # run build standalone for docker version
 
 ## Production image, copy all the files and run next
