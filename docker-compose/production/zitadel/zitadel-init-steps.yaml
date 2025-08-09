@@ -8,4 +8,4 @@ FirstInstance:
       Password: 'Password1!'
       Email:
         # Optional, if set, can be used to log in with email.
-        Address: 'example@zitadel.com' # ZITADEL_FIRSTINSTANCE_ORG_HUMAN_EMAIL_ADDRESS    
+        Address: 'admin@prometheusags.ai' # ZITADEL_FIRSTINSTANCE_ORG_HUMAN_EMAIL_ADDRESS    

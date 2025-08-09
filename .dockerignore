@@ -1,9 +1,47 @@
-Dockerfile
-.dockerignore
-node_modules
-npm-debug.log
-.next
+# Ignore data directories
+**/data
+**/lobe_data
+**/s3_data
+**/postgres
+**/meili_data_v1.12
+**/uploads
+**/logs
+**/ollama
+
+# Ignore docker files
+docker-compose*.yml
+Dockerfile*
+
+# Ignore git
 .git
-.github
-*.md
-.env.example
+.gitignore
+
+# Ignore node_modules (will be installed during build)
+node_modules
+
+# Ignore IDE files
+.vscode
+.idea
+
+# Ignore temp files
+*.log
+*.tmp
+
+# Environment backups
+*.env.backup*
+
+# Additional build artifacts
+*.tar
+*.tar.gz
+tribehealth-lobechat-*.tar
+
+# Backup files
+*.backup
+*.backup-*
+
+# Additional data directories we might encounter
+**/minio-data
+**/postgres-data
+**/postgresql-data
+**/s3-data
+

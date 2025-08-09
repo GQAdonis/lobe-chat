@@ -12,6 +12,15 @@ interface ReactRendererProps {
 
 const ReactRenderer = memo<ReactRendererProps>(({ code }) => {
   const title = useChatStore(chatPortalSelectors.artifactTitle);
+  
+  // Get custom bundler URL from environment variable (server-side)
+  const customBundlerURL = process.env.SANDPACK_BUNDLER_URL;
+
+  const sandpackOptions = {
+    externalResources: ['https://cdn.tailwindcss.com'],
+    visibleFiles: ['App.tsx'],
+    ...(customBundlerURL && { bundlerURL: customBundlerURL }),
+  };
 
   return (
     <SandpackProvider
@@ -34,10 +43,7 @@ const ReactRenderer = memo<ReactRendererProps>(({ code }) => {
         'App.tsx': code,
         ...createTemplateFiles({ title }),
       }}
-      options={{
-        externalResources: ['https://cdn.tailwindcss.com'],
-        visibleFiles: ['App.tsx'],
-      }}
+      options={sandpackOptions}
       style={{ height: '100%' }}
       template="vite-react-ts"
       theme="auto"

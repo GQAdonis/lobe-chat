@@ -1,0 +1,21 @@
+# Environment files (keep examples, ignore actual configs)
+.env
+.env.local
+.env.backup*
+
+# Data directories
+data/
+**/data/
+
+# Log files
+*.log
+logs/
+
+# Temporary files
+*.tmp
+*.temp
+
+# Backup files
+*.backup
+*.backup-*
+

@@ -278,3 +278,5 @@ export class LobeOllamaAI implements LobeRuntimeAI {
 }
 
 export default LobeOllamaAI;
+
+export { LobeOllamaAI };

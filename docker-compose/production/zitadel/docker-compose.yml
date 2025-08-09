@@ -4,66 +4,132 @@ services:
     image: pgvector/pgvector:pg16
     container_name: lobe-postgres
     ports:
-      - '5432:5432'
+      - '15432:5432'
     volumes:
       - './data:/var/lib/postgresql/data'
     environment:
       - 'POSTGRES_DB=lobe'
       - 'POSTGRES_PASSWORD=uWNZugjBqixf8dxC'
+    command: |
+      postgres -c wal_level=logical -c max_wal_senders=10 -c max_replication_slots=10
     healthcheck:
       test: ['CMD-SHELL', 'pg_isready -U postgres']
       interval: 5s
       timeout: 5s
       retries: 5
     restart: always
+    networks:
+      - backend
 
   minio:
     image: minio/minio:RELEASE.2025-04-22T22-12-26Z
     container_name: lobe-minio
     ports:
-      - '9000:9000'
-      - '9001:9001'
+      - '19000:9000'
+      - '19001:9001'
     volumes:
       - './s3_data:/etc/minio/data'
     environment:
-      - 'MINIO_ROOT_USER=YOUR_MINIO_USER'
-      - 'MINIO_ROOT_PASSWORD=YOUR_MINIO_PASSWORD'
-      - 'MINIO_DOMAIN=lobe-s3-api.example.com'
-      - 'MINIO_API_CORS_ALLOW_ORIGIN=https://lobe.example.com' # Your LobeChat's domain name.
+      - 'MINIO_ROOT_USER=lobechat'
+      - 'MINIO_ROOT_PASSWORD=5ZpFPqomq7PmOYsFRCe3HtIN5Dvaws5/EyVbQFhZGTE='
+      - 'MINIO_DOMAIN=lobe.prometheusags.ai/s3'
+      - 'MINIO_API_CORS_ALLOW_ORIGIN=https://lobe.prometheusags.ai'
     restart: always
+    networks:
+      - backend
     command: >
       server /etc/minio/data --address ":9000" --console-address ":9001"
 
+  electric:
+    image: electricsql/electric:latest
+    container_name: lobe-electric
+    restart: unless-stopped
+    environment:
+      DATABASE_URL: postgres://postgres:uWNZugjBqixf8dxC@postgresql:5432/lobe
+      PORT: 5133
+      ELECTRIC_SECRET: 2f8ANsvXR+TmJj3frS0nw52PxAvQiaDRxGEegnnA3R4=
+      ELECTRIC_HOST: 0.0.0.0
+    depends_on:
+      - postgresql
+    networks:
+      - backend
+    ports:
+      - "5133:5133"
+    volumes:
+      - electric_data:/var/lib/electric
 
   zitadel:
     restart: always
     image: ghcr.io/zitadel/zitadel:latest
     container_name: lobe-zitadel
-    command: start-from-init --config /zitadel-config.yaml --steps /zitadel-init-steps.yaml --masterkey "cft3Tekr/rQBOqwoQSCPoncA9BHbn7QJ" --tlsMode external #MasterkeyNeedsToHave32Characters
+    command: start-from-init --config /zitadel-config.yaml --steps /zitadel-init-steps.yaml --masterkey "cft3Tekr/rQBOqwoQSCPoncA9BHbn7QJ" --tlsMode external
     ports:
-      - 8080:8080
+      - 27080:8080
     volumes:
       - ./zitadel-config.yaml:/zitadel-config.yaml:ro
       - ./zitadel-init-steps.yaml:/zitadel-init-steps.yaml:ro
+      - '.:/current-dir:rw'
     depends_on:
       postgresql:
         condition: service_healthy
+    networks:
+      - backend
+    environment:
+      - ZITADEL_EXTERNALDOMAIN=auth.prometheusags.ai
+      - ZITADEL_EXTERNALPORT=443
+      - ZITADEL_EXTERNALSECURE=true
+      - ZITADEL_TLS_ENABLED=false
+      - ZITADEL_FIRSTINSTANCE_LOGINCLIENTPATPATH=/current-dir/login-client.pat
+      - ZITADEL_FIRSTINSTANCE_ORG_LOGINCLIENT_MACHINE_USERNAME=login-client
+      - ZITADEL_FIRSTINSTANCE_ORG_LOGINCLIENT_MACHINE_NAME=Automatically Initialized IAM Login Client
+      - ZITADEL_FIRSTINSTANCE_ORG_LOGINCLIENT_PAT_EXPIRATIONDATE=2029-01-01T00:00:00Z
+
+  zitadel-login:
+    restart: unless-stopped
+    image: ghcr.io/zitadel/zitadel-login:latest
+    container_name: lobe-zitadel-login
+    environment:
+      - ZITADEL_API_URL=http://zitadel:8080
+      - NEXT_PUBLIC_BASE_PATH=/ui/v2/login
+      - ZITADEL_SERVICE_USER_TOKEN_FILE=/current-dir/login-client.pat
+      - CUSTOM_REQUEST_HEADERS=Host:auth.prometheusags.ai
+    volumes:
+      - '.:/current-dir:ro'
+    networks:
+      - backend
+    ports:
+      - "27081:3000"
+    depends_on:
+      - zitadel
 
   lobe:
     image: lobehub/lobe-chat-database
     container_name: lobe-chat
     ports:
-      - '3210:3210'
+      - '13000:3210'
     depends_on:
       - postgresql
       - minio
       - zitadel
+      - electric
     env_file:
       - .env
     restart: always
+    networks:
+      - backend
+    environment:
+      - NEXT_PUBLIC_API_URL=https://lobe.prometheusags.ai/
+      - NEXT_PUBLIC_ELECTRIC_URL=https://lobe.prometheusags.ai/electric/
+      - NEXT_PUBLIC_AUTH_URL=https://auth.prometheusags.ai/
 
 volumes:
   data:
     driver: local
   s3_data:
     driver: local
+  electric_data:
+    driver: local
+
+networks:
+  backend:
+    driver: bridge

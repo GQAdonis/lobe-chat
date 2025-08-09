@@ -12,7 +12,6 @@ export { LobeMinimaxAI } from './minimax';
 export { LobeMistralAI } from './mistral';
 export { ModelRuntime } from './ModelRuntime';
 export { LobeMoonshotAI } from './moonshot';
-export { LobeOllamaAI } from './ollama';
 export { LobeOpenAI } from './openai';
 export { LobeOpenRouterAI } from './openrouter';
 export { LobePerplexityAI } from './perplexity';

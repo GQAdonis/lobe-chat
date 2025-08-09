@@ -250,7 +250,7 @@ export const createSessionSlice: StateCreator<
           );
           set({ isSessionsFirstFetchFinished: true }, false, n('useFetchSessions/onSuccess', data));
         },
-        suspense: true,
+        // suspense: true, // Disabled to fix SSR build error
       },
     ),
   useSearchSessions: (keyword) =>

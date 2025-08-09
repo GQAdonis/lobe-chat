@@ -2,7 +2,7 @@ Log:
   Level: 'info'
 
 ExternalPort: 443 
-ExternalDomain: example.com #Your zitadel's domain name
+ExternalDomain: auth.prometheusags.ai #Your zitadel's domain name
 ExternalSecure: true 
 TLS:
   Enabled: false # ZITADEL_TLS_ENABLED

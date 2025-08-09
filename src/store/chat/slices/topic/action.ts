@@ -195,7 +195,7 @@ export const chatTopic: StateCreator<
       enable ? [SWR_USE_FETCH_TOPIC, sessionId] : null,
       async ([, sessionId]: [string, string]) => topicService.getTopics({ sessionId }),
       {
-        suspense: true,
+        // suspense: true, // Disabled to fix SSR build error
         fallbackData: [],
         onSuccess: (topics) => {
           const nextMap = { ...get().topicMaps, [sessionId]: topics };

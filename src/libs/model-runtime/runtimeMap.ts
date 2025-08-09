@@ -29,7 +29,6 @@ import { LobeModelScopeAI } from './modelscope';
 import { LobeMoonshotAI } from './moonshot';
 import { LobeNovitaAI } from './novita';
 import { LobeNvidiaAI } from './nvidia';
-import { LobeOllamaAI } from './ollama';
 import { LobeOpenAI } from './openai';
 import { LobeOpenRouterAI } from './openrouter';
 import { LobePerplexityAI } from './perplexity';
@@ -87,7 +86,6 @@ export const providerRuntimeMap = {
   moonshot: LobeMoonshotAI,
   novita: LobeNovitaAI,
   nvidia: LobeNvidiaAI,
-  ollama: LobeOllamaAI,
   openai: LobeOpenAI,
   openrouter: LobeOpenRouterAI,
   perplexity: LobePerplexityAI,

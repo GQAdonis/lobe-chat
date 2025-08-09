@@ -4,12 +4,31 @@ services:
     image: pgvector/pgvector:pg16
     container_name: lobe-postgres
     ports:
-      - '5432:5432'
+      - '25434:5432'
     volumes:
       - './data:/var/lib/postgresql/data'
     environment:
+      - 'POSTGRES_DB=logto'
+      - 'POSTGRES_PASSWORD=uWNZugjBqixf8dxC'
+      - 'POSTGRES_USER=postgres'
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U postgres']
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    restart: always
+
+  postgresql-lobe:
+    image: pgvector/pgvector:pg16
+    container_name: lobe-postgres-app
+    ports:
+      - '25435:5432'
+    volumes:
+      - './lobe_data:/var/lib/postgresql/data'
+    environment:
       - 'POSTGRES_DB=lobe'
       - 'POSTGRES_PASSWORD=uWNZugjBqixf8dxC'
+      - 'POSTGRES_USER=postgres'
     healthcheck:
       test: ['CMD-SHELL', 'pg_isready -U postgres']
       interval: 5s
@@ -18,46 +37,44 @@ services:
     restart: always
 
   minio:
-    image: minio/minio:RELEASE.2025-04-22T22-12-26Z
+    image: minio/minio:latest
     container_name: lobe-minio
     ports:
-      - '9000:9000'
-      - '9001:9001'
+      - '29000:9000'
+      - '29001:9001'
     volumes:
-      - './s3_data:/etc/minio/data'
+      - './s3_data:/data'
     environment:
-      - 'MINIO_ROOT_USER=YOUR_MINIO_USER'
-      - 'MINIO_ROOT_PASSWORD=YOUR_MINIO_PASSWORD'
-      - 'MINIO_DOMAIN=lobe-s3-api.example.com'
-      - 'MINIO_API_CORS_ALLOW_ORIGIN=https://lobe.example.com' # Your LobeChat's domain name.
+      - 'MINIO_ROOT_USER=lobe_minio_user'
+      - 'MINIO_ROOT_PASSWORD=lobe_minio_password_123'
     restart: always
     command: >
-      server /etc/minio/data --address ":9000" --console-address ":9001"
-
+      server /data --address ":9000" --console-address ":9001"
 
   logto:
-    image: svhd/logto
+    image: svhd/logto:latest
     container_name: lobe-logto
     ports:
-      - '3001:3001'
-      - '3002:3002'
+      - '23001:3001'  # API endpoint
+      - '23002:3002'  # Admin console
     depends_on:
       postgresql:
         condition: service_healthy
     environment:
       - 'TRUST_PROXY_HEADER=1'
       - 'DB_URL=postgresql://postgres:uWNZugjBqixf8dxC@postgresql:5432/logto'
-      - 'ENDPOINT=https://lobe-auth-api.example.com'
-      - 'ADMIN_ENDPOINT=https://lobe-auth-ui.example.com'
+      - 'ENDPOINT=https://auth.prometheusags.ai'  # OIDC API domain
+      - 'ADMIN_ENDPOINT=https://admin.prometheusags.ai'  # Admin console domain
     entrypoint: ['sh', '-c', 'npm run cli db seed -- --swe && npm start']
+    restart: always
 
   lobe:
-    image: lobehub/lobe-chat-database
+    image: tribehealth/lobechat:08093035
     container_name: lobe-chat
     ports:
-      - '3210:3210'
+      - '23210:3210'
     depends_on:
-      - postgresql
+      - postgresql-lobe
       - minio
       - logto
     env_file:
@@ -66,6 +83,8 @@ services:
 
 volumes:
   data:
+    driver: local
+  lobe_data:
     driver: local
   s3_data:
     driver: local

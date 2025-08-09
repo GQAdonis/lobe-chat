@@ -110,3 +110,36 @@ CLAUDE.*.md
 *.ppt*
 *.doc*
 *.xls*
+
+# Docker and containerization
+docker-compose/*/data/
+docker-compose/*/.env
+docker-compose/*/.env.local
+docker-compose/*/.env.backup*
+**/lobe_data/
+**/s3_data/
+**/postgres/
+**/meili_data*/
+**/uploads/
+**/ollama/
+
+# MinIO and S3 storage
+minio-data/
+s3-data/
+
+# Database data
+postgres-data/
+postgresql-data/
+
+# Built Docker images (exclude from source control)
+*.tar
+*.tar.gz
+
+# Backup files created during configuration
+*.backup
+*.backup-*
+.env.backup*
+
+# Custom build artifacts
+tribehealth-lobechat-*.tar
+

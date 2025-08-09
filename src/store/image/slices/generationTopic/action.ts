@@ -218,7 +218,7 @@ export const createGenerationTopicSlice: StateCreator<
       enabled ? [FETCH_GENERATION_TOPICS_KEY] : null,
       () => generationTopicService.getAllGenerationTopics(),
       {
-        suspense: true,
+        // suspense: true, // Disabled to fix SSR build error
         onSuccess: (data) => {
           // No need to update if data is the same
           if (isEqual(data, get().generationTopics)) return;

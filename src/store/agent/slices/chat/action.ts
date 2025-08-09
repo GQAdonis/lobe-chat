@@ -183,7 +183,7 @@ export const createChatSlice: StateCreator<
       ([, id]: string[]) => agentService.getFilesAndKnowledgeBases(id),
       {
         fallbackData: [],
-        suspense: true,
+        // suspense: true, // Disabled to fix SSR build error
       },
     );
   },
